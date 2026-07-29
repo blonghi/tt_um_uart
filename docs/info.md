@@ -23,7 +23,7 @@ The design is split into four modules:
 
 | Pin | Direction | Name | Function |
 |---|---|---|---|
-| `ui_in[7:0]` | input | `tx_data` | Full byte to transmit (sampled on `wr_enb`). No longer shares a pin with RX. |
+| `ui_in[7:0]` | input | `tx_data` | Full byte to transmit (sampled on `wr_enb`).|
 | `uo_out[0]` | output | `tx` | Serial TX output. Idles high. |
 | `uo_out[1]` | output | `rx_valid` | Pulses high for one clock cycle when a complete byte has been received. |
 | `uo_out[7:2]` | output | (none) | Unused, tied to 0. |
