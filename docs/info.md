@@ -21,6 +21,18 @@ The design is split into four modules:
 
 - **`receiver`** - FSM that watches the rx line for a falling edge (start bit) then samples 8 data bits at the center od each bit period (16x oversampling to find bit-center), then checks for the stop bit and pulses rx_valid for one cycle with the received byte on rx_data.
 
+| Pin | Direction | Name | Function |
+|---|---|---|---|
+| `ui_in[7:0]` | input | `tx_data` | Full byte to transmit (sampled on `wr_enb`). No longer shares a pin with RX. |
+| `uo_out[0]` | output | `tx` | Serial TX output. Idles high. |
+| `uo_out[1]` | output | `rx_valid` | Pulses high for one clock cycle when a complete byte has been received. |
+| `uo_out[7:2]` | output | (none) | Unused, tied to 0. |
+| `uio_in[0]` | input | `wr_enb` | Pulse high for one clock cycle to latch `ui_in` and begin transmission. |
+| `uio_in[1]` | input | `rx` | Serial RX input. |
+| `uio_in[7:2]` | input | (none) | Unused. |
+| `uio_out[7:0]` | output | `rx_data` | Last byte received. Updates when `rx_valid` pulses and holds its value continuously (does not reset to 0 between frames). |
+| `uio_oe` | (none) | (none) | Fixed to `8'hFF` (all `uio` pins set as outputs). |
+
 ### Limitations
 - No parity bit. 
 - If there is a bad frame, it is simply never latched with no downstream indication the error occurred. 
@@ -28,8 +40,19 @@ The design is split into four modules:
 
 ## How to test
 
-Explain how to use your project
+**RTL simulation**
+
+```bash
+cd test
+pip install -r requirements.txt
+make -B
+```
+
+**GLS**
+
+Requires one-time PDK setup which can be a headache ;-;. Visit `docs/local_hardening_and_gls_notes.md` to set that up. 
+
 
 ## External hardware
 
-List external hardware used in your project (e.g. PMOD, LED display, etc), if any
+None required, however, for a more realistic validation you may want to connect the UART to a USB-to-serial adapter or a microcontroller. 
