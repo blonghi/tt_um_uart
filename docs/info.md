@@ -50,7 +50,7 @@ make -B
 
 **GLS**
 
-Requires one-time PDK setup which can be a headache ;-;. Visit `docs/local_hardening_and_gls_notes.md` to set that up. 
+Requires one-time PDK setup which can be a headache ;-;. Visit `docs/pdk_notes.md` to set that up. 
 
 
 ## External hardware

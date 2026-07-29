@@ -2,6 +2,8 @@
 
 # Tiny Tapeout UART (Universal Asynchronous Receiver-Transmitter)
 
+Welcome to my first ever tapeout! I chose to build a simple UART to get familiar with the tapeout flow + it sounded like a fun project to validate with my Arduino + nano FPGA.  
+
 - [Read the documentation for my project](docs/info.md)
 
 ## What is Tiny Tapeout?
