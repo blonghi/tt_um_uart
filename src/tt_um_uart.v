@@ -16,11 +16,7 @@ module tt_um_uart (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  // All output pins must be assigned. If not used, assign to 0.
-
   
-
-  wire wr_enb = uio_in[0];
   wire tx_enb;
   wire [7:0] tx_data = ui_in;
 
@@ -29,13 +25,22 @@ module tt_um_uart (
   wire [7:0] rx_data;
   wire rx_valid;
 
-  reg [7:0] temp;
 
-  // List all unused inputs to prevent warnings
-  wire _unused = &{uio_in[7:1], uio_out, uio_oe, ena};
+  // list all unused inputs to prevent warnings
+  wire _unused = &{uio_in[7:2], ena};
 
-  assign uio_out = rx_data;
-  assign uio_oe = 8'hFF;
+  //uio upper 6 bits are permanently out, lower 2 bits permanently in
+  assign uio_oe = 8'b1111_1100;
+
+  //rx data is split: it's upper 6 bits drive uio_out[7:2], lower 2 bits drive uo_out
+  assign uio_out[7:2] = rx_data[7:2];
+  assign uo_out[3:2] = rx_data[1:0];
+
+  wire wr_enb = uio_in[0];
+
+
+
+
 
   baud_rate_gen u_baudrate_generator (
     //inputs
@@ -75,8 +80,7 @@ module tt_um_uart (
 
 
 assign uo_out[1] = rx_valid;
-assign uo_out[7:2] = 0;
-
-
+assign uo_out[7:4] = 0; 
+assign uio_out[1:0] = 0;
 
 endmodule
