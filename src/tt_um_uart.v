@@ -25,16 +25,16 @@ module tt_um_uart (
   wire [7:0] rx_data;
   wire rx_valid;
 
-
   // list all unused inputs to prevent warnings
   wire _unused = &{uio_in[7:2], ena};
 
-  //uio upper 6 bits are permanently out, lower 2 bits permanently in
+  // uio[1:0] = input (wr_enb, rx), uio[7:2] = output (rx_data)
   assign uio_oe = 8'b1111_1100;
 
-  //rx data is split: it's upper 6 bits drive uio_out[7:2], lower 2 bits drive uo_out
+  // rx_data split: uio can't carry all 8 bits since uio[1:0] are reserved
+  // as inputs (wr_enb, rx) see README pin table for full pin map
   assign uio_out[7:2] = rx_data[7:2];
-  assign uo_out[3:2] = rx_data[1:0];
+  assign uo_out[3:2]  = rx_data[1:0];
 
   wire wr_enb = uio_in[0];
 
@@ -63,7 +63,7 @@ module tt_um_uart (
 
     //outputs
     .tx(uo_out[0])
-  ); 
+  );
 
   receiver u_receiver (
     // inputs
@@ -78,9 +78,10 @@ module tt_um_uart (
     .rx_valid(rx_valid)
   );
 
+  assign uo_out[1]   = rx_valid;
 
-assign uo_out[1] = rx_valid;
-assign uo_out[7:4] = 0; 
-assign uio_out[1:0] = 0;
+  //unused pins
+  assign uo_out[7:4] = 4'b0; 
+  assign uio_out[1:0] = 2'b0;  
 
 endmodule
