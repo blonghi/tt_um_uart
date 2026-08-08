@@ -16,7 +16,6 @@ module tt_um_uart (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  
   wire tx_enb;
   wire [7:0] tx_data = ui_in;
 
@@ -37,10 +36,6 @@ module tt_um_uart (
   assign uo_out[3:2]  = rx_data[1:0];
 
   wire wr_enb = uio_in[0];
-
-
-
-
 
   baud_rate_gen u_baudrate_generator (
     //inputs

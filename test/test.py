@@ -53,7 +53,9 @@ def get_tx_pin(dut):
 
 
 def get_rx_data(dut):
-    return int(dut.uio_out.value)
+    low = (int(dut.uo_out.value) >> 2) & 0x3
+    high = (int(dut.uio_out.value) >> 2) & 0x3F
+    return (high << 2) | low
 
 
 def get_rx_valid(dut):
