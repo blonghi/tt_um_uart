@@ -46,6 +46,10 @@ The design is split into four modules:
 | — | `uio_out[1:0]` | tied to 0 |
 | `uio_oe` | — | fixed `8'b1111_1100` |
 
+**Note:** `uio_oe` is fixed since I needed to accommodate 6 continuous
+output pins for the upper bits of rx_data and 2 input pins for wr_enb
+and rx.
+
 ### Limitations
 - No parity bit. 
 - If there is a bad frame, it is simply never latched with no downstream indication the error occurred. 
