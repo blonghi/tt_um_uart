@@ -53,7 +53,7 @@ and rx.
 ### Limitations
 - No parity bit. 
 - If there is a bad frame, it is simply never latched with no downstream indication the error occurred. 
-- `rx_data` is split between two buses:  `uio_out` and `uo_out'
+- `rx_data` is split between two buses:  `uio_out` and `uo_out`
 
 
 ## How to test
