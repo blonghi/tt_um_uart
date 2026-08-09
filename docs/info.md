@@ -17,19 +17,29 @@ The design is split into four modules:
 
 - **`baud_rate_gen`** - generates two enable ticks from the system clock. 'tx_counter' is free-running, wrapping around at 5208, producing 'tx_enb' (one pulse per baud period). 'rx_counter' wraps around at 326 (1/16th of 'tx_counter's range) This produces 'rx_enb' at 16x the rate to allow the receiver to oversample and locate the center of each incoming bit. 'rx_counter' resets every 'rx_sync' pulse (start-bit detection), keeping RX sampling aligned. 
 
+- **`transmitter`** - FSM that on write request serializes an 8-bit byte onto the tx line as: start bit, 8 data bits (LSB first),  then a stop bit. 
+
+```mermaid
+stateDiagram-v2
+direction LR
+    [*] --> IDLE
+    IDLE --> START: wr_enb
+    START --> DATA: tx_enb
+    DATA --> STOP: 8 bits transmitted
+    STOP --> IDLE: tx_enb
+```
+
+- **`receiver`** - FSM that watches the rx line for a falling edge (start bit) then samples 8 data bits at the center od each bit period (16x oversampling to find bit-center), then checks for the stop bit and pulses rx_valid for one cycle with the received byte on rx_data.
+
 ```mermaid
 stateDiagram-v2
 direction LR
     [*] --> IDLE
     IDLE --> START: falling edge
     START --> DATA: rx_enb
-    DATA --> STOP: 8 bits
+    DATA --> STOP: 8 bits received
     STOP --> IDLE: valid stop bit
 ```
-
-- **`transmitter`** - FSM that on write request serializes an 8-bit byte onto the tx line as: start bit, 8 data bits (LSB first),  then a stop bit. 
-
-- **`receiver`** - FSM that watches the rx line for a falling edge (start bit) then samples 8 data bits at the center od each bit period (16x oversampling to find bit-center), then checks for the stop bit and pulses rx_valid for one cycle with the received byte on rx_data.
 
 **TX (transmit)**
 | Signal | Pin | Direction |
