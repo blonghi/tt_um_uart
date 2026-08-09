@@ -19,6 +19,7 @@ The design is split into four modules:
 
 ```mermaid
 stateDiagram-v2
+direction LR
     [*] --> IDLE
     IDLE --> START: falling edge
     START --> DATA: rx_enb
