@@ -21,22 +21,35 @@ The design is split into four modules:
 
 - **`receiver`** - FSM that watches the rx line for a falling edge (start bit) then samples 8 data bits at the center od each bit period (16x oversampling to find bit-center), then checks for the stop bit and pulses rx_valid for one cycle with the received byte on rx_data.
 
-| Pin | Direction | Name | Function |
-|---|---|---|---|
-| `ui_in[7:0]` | input | `tx_data` | Full byte to transmit (sampled on `wr_enb`).|
-| `uo_out[0]` | output | `tx` | Serial TX output. Idles high. |
-| `uo_out[1]` | output | `rx_valid` | Pulses high for one clock cycle when a complete byte has been received. |
-| `uo_out[7:2]` | output | (none) | Unused, tied to 0. |
-| `uio_in[0]` | input | `wr_enb` | Pulse high for one clock cycle to latch `ui_in` and begin transmission. |
-| `uio_in[1]` | input | `rx` | Serial RX input. |
-| `uio_in[7:2]` | input | (none) | Unused. |
-| `uio_out[7:0]` | output | `rx_data` | Last byte received. Updates when `rx_valid` pulses and holds its value continuously (does not reset to 0 between frames). |
-| `uio_oe` | (none) | (none) | Fixed to `8'hFF` (all `uio` pins set as outputs). |
+**TX (transmit)**
+| Signal | Pin | Direction |
+|---|---|---|
+| `tx_data` | `ui_in[7:0]` | input |
+| `wr_enb` | `uio_in[0]` | input |
+| `tx` | `uo_out[0]` | output |
+
+**RX (receive)**
+| Signal | Pin | Direction |
+|---|---|---|
+| `rx` | `uio_in[1]` | input |
+| `rx_valid` | `uo_out[1]` | output |
+| `rx_data[1:0]` | `uo_out[3:2]` | output |
+| `rx_data[7:2]` | `uio_out[7:2]` | output |
+
+**Note: ** keep in mind that `rx_data` is split across two separate output buses
+
+**Unused / fixed**
+| Signal | Pin | Value |
+|---|---|---|
+| — | `uio_in[7:2]` | unused |
+| — | `uo_out[7:4]` | tied to 0 |
+| — | `uio_out[1:0]` | tied to 0 |
+| `uio_oe` | — | fixed `8'b1111_1100` |
 
 ### Limitations
 - No parity bit. 
 - If there is a bad frame, it is simply never latched with no downstream indication the error occurred. 
--`rx_data` is split between both `uio_out` and `uo_out'
+-`rx_data` is split between two buses:  `uio_out` and `uo_out'
 
 
 ## How to test
@@ -56,4 +69,4 @@ Requires one-time PDK setup which can be a headache ;-;. Visit `docs/pdk_notes.m
 
 ## External hardware
 
-None required, however, for a more realistic validation you may want to connect the UART to a USB-to-serial adapter or a microcontroller. 
+None required, however, I will be connecting it to a microcontroller for validation. 
