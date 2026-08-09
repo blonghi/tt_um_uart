@@ -68,7 +68,7 @@ make -B
 
 **GLS**
 
-Requires one-time PDK setup which can be a headache ;-;. Visit `docs/pdk_notes.md` to set that up. 
+Requires one-time PDK setup which can be a headache ;-;. 
 
 
 ## External hardware
