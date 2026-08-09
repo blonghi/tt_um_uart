@@ -36,7 +36,7 @@ The design is split into four modules:
 | `rx_data[1:0]` | `uo_out[3:2]` | output |
 | `rx_data[7:2]` | `uio_out[7:2]` | output |
 
-**Note: ** keep in mind that `rx_data` is split across two separate output buses
+**Note:** keep in mind that `rx_data` is split across two separate output buses
 
 **Unused / fixed**
 | Signal | Pin | Value |
