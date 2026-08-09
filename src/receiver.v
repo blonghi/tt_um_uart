@@ -12,10 +12,6 @@ module receiver (
     output reg rx_valid
 );
 
-  reg [3:0] bit_index;  // track bit w each baud tick
-  reg [7:0] shift_reg;  // temp storage of byte
-  reg [3:0] rx_counter;  // track baud ticks
-  reg rx_prev;  // keeping track of when the start bit edge falls
 
   typedef enum reg [1:0] {
     IDLE  = 2'b00,
@@ -25,7 +21,20 @@ module receiver (
   } state_t;
 
   state_t state;
+
+  // Detects the start bit
+  reg rx_prev;
   wire falling_edge = (rx_prev == 1'b1) && (rx == 1'b0);
+
+  // Tracks the index of the bit being sampled
+  reg [3:0] bit_index;
+
+  // Counts the 16 sampling ticks to collect data at tick 8
+  reg [3:0] rx_counter;
+
+  // Stores the received byte until the stop bit is validated.
+  reg [7:0] shift_reg;
+
 
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin

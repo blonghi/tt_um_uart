@@ -8,8 +8,17 @@ module baud_rate_gen (
     output wire rx_enb
 );
 
+// Timing assumptions:
+//      Clock: 50 MHz
+//      Baud: 9600 bits/second 
+//      TX: ~5208 cycles/bit (50 MHz / 9600)
+//      RX: 326 cycles/RX tick (5208 / 16 = ~326)
+
   reg [12:0] tx_counter;
   reg [12:0] rx_counter;
+
+
+// 16x oversampling, we sample rx at 8th sample to account for timing asymmetry
 
   always @(posedge clk) begin
     if (!rst_n || rx_sync) rx_counter <= 0;

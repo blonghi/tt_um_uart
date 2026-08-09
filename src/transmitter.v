@@ -4,15 +4,22 @@ module transmitter (
     input clk,
     input rst_n,
 
-    input wr_enb,  // new byte is ready, start sending
-    input tx_enb,  // send bit now
-    input [7:0] tx_data,  // byte to send
+    input wr_enb,  // New byte is ready, start transmitting
+    input tx_enb,  // Advance to the next bit
+    input [7:0] tx_data,  // Byte to transmit
 
     output reg tx
 );
 
-  reg [2:0] bit_index;  // track bit w each baud tick
-  reg [7:0] shift_reg;  // temp storage of byte
+  // 1 start bit, 8 data bits, 1 stop bit
+
+  // Tracks the index of the bit being transmitted.
+  reg [2:0] bit_index;
+
+  // Temporary storage of the byte currently being transmitted.
+  reg [7:0] tx_reg;
+
+  // Tracks the two ticks needed to complete stop-bit phase
   reg stop_phase;
 
   typedef enum reg [1:0] {
@@ -29,7 +36,7 @@ module transmitter (
       state <= IDLE;
       tx <= 1;
       bit_index <= 0;
-      shift_reg <= 0;
+      tx_reg <= 0;
       stop_phase <= 0;
 
     end else begin
@@ -42,8 +49,8 @@ module transmitter (
           stop_phase <= 0;
 
           if (wr_enb) begin
-            state <= START;
-            shift_reg <= tx_data;
+            state  <= START;
+            tx_reg <= tx_data;
           end
         end
 
@@ -51,7 +58,7 @@ module transmitter (
           tx <= 0;
 
           if (tx_enb) begin
-            tx <= shift_reg[0];
+            tx <= tx_reg[0];
             bit_index <= 1;
             state <= DATA;
           end
@@ -59,7 +66,7 @@ module transmitter (
 
         DATA: begin
           if (tx_enb) begin
-            tx <= shift_reg[bit_index];
+            tx <= tx_reg[bit_index];
 
             if (bit_index == 7) state <= STOP;
             else bit_index <= bit_index + 1;
