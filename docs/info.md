@@ -24,6 +24,7 @@ stateDiagram-v2
     START --> DATA: rx_enb
     DATA --> STOP: 8 bits
     STOP --> IDLE: valid stop bit
+```
 
 - **`transmitter`** - FSM that on write request serializes an 8-bit byte onto the tx line as: start bit, 8 data bits (LSB first),  then a stop bit. 
 
