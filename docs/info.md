@@ -71,7 +71,7 @@ output pins for the upper bits of rx_data and 2 input pins for wr_enb
 and rx.
 
 
-## How it works
+## Baud rate assumptions
 
 **My Main Assumptions**
 
@@ -82,6 +82,8 @@ and rx.
 - RX: approximately **326 clock cycles per tick**
 - RX samples near **tick 8**
 
+
+# The Math: 
 The 50 MHz clock means:
 
 $$
