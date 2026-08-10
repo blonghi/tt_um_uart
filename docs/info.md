@@ -41,6 +41,8 @@ direction LR
     STOP --> IDLE: valid stop bit
 ```
 
+## Pin mappings
+
 **TX (transmit)**
 | Signal | Pin | Direction |
 |---|---|---|
@@ -94,14 +96,47 @@ $$
 9600 baud means:
 
 $$
-9600 \text{ UART bits per second}
+9600 \text{bits per second}
 $$
 
-So the number of clock cycles in one UART bit is:
+So the number of clock cycles in one bit is:
 
 $$
 \frac{50,000,000}{9600} \approx 5208.33
 $$
+
+For RX, I use **16x oversampling**, meaning there are 16 RX ticks for every bit:
+
+```mermaid
+direction LR
+timeline
+    title 16x RX Oversampling
+
+    0 : RX tick
+    1 : RX tick
+    2 : RX tick
+    3 : RX tick
+    4 : RX tick
+    5 : RX tick
+    6 : RX tick
+    7 : RX tick
+    8 : SAMPLE
+    9 : RX tick
+    10 : RX tick
+    11 : RX tick
+    12 : RX tick
+    13 : RX tick
+    14 : RX tick
+    15 : RX tick
+```
+
+$$
+\frac{5208.33}{16} \approx 325.52
+$$
+
+So the RX counter uses approximately 326 clock cycles per RX tick.
+
+The receiver then counts these 16 RX ticks and samples the actual RX signal around tick 8.
 
 ### Limitations
 - No parity bit. 
@@ -123,7 +158,3 @@ make -B
 
 Requires one-time PDK setup which can be a headache ;-;. 
 
-
-## External hardware
-
-None required, however, I will be connecting it to a microcontroller for validation. 
