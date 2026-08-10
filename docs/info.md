@@ -41,6 +41,12 @@ direction LR
     STOP --> IDLE: valid stop bit
 ```
 
+### Limitations
+- No parity bit. 
+- If there is a bad frame, it is simply never latched with no downstream indication the error occurred. 
+- `rx_data` is split between two buses:  `uio_out` and `uo_out`
+
+
 ## Pin mappings
 
 **TX (transmit)**
@@ -115,10 +121,6 @@ So the RX counter uses approximately 326 clock cycles per RX tick.
 
 The receiver then counts these 16 RX ticks and samples the actual RX signal around tick 8.
 
-### Limitations
-- No parity bit. 
-- If there is a bad frame, it is simply never latched with no downstream indication the error occurred. 
-- `rx_data` is split between two buses:  `uio_out` and `uo_out`
 
 
 ## How to test
