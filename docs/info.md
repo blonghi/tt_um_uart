@@ -108,7 +108,6 @@ $$
 For RX, I use **16x oversampling**, meaning there are 16 RX ticks for every bit:
 
 ```mermaid
-direction LR
 timeline
     title 16x RX Oversampling
 
