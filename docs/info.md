@@ -107,28 +107,6 @@ $$
 
 For RX, I use **16x oversampling**, meaning there are 16 RX ticks for every bit:
 
-```mermaid
-timeline
-    title 16x RX Oversampling
-
-    0 : RX tick
-    1 : RX tick
-    2 : RX tick
-    3 : RX tick
-    4 : RX tick
-    5 : RX tick
-    6 : RX tick
-    7 : RX tick
-    8 : SAMPLE
-    9 : RX tick
-    10 : RX tick
-    11 : RX tick
-    12 : RX tick
-    13 : RX tick
-    14 : RX tick
-    15 : RX tick
-```
-
 $$
 \frac{5208.33}{16} \approx 325.52
 $$
