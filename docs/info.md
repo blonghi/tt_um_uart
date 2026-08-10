@@ -70,6 +70,36 @@ direction LR
 output pins for the upper bits of rx_data and 2 input pins for wr_enb
 and rx.
 
+
+### Baud Rate
+
+**My Main Assumptions**
+
+- System clock: **50 MHz**
+- Target baud rate: **9600**
+- TX: approximately **5208 clock cycles per bit**
+- RX: **16x oversampling**
+- RX: approximately **326 clock cycles per tick**
+- RX samples near **tick 8**
+
+The 50 MHz clock means:
+
+$$
+50,000,000 \text{ clock cycles per second}
+$$
+
+9600 baud means:
+
+$$
+9600 \text{ UART bits per second}
+$$
+
+So the number of clock cycles in one UART bit is:
+
+$$
+\frac{50,000,000}{9600} \approx 5208.33
+$$
+
 ### Limitations
 - No parity bit. 
 - If there is a bad frame, it is simply never latched with no downstream indication the error occurred. 
