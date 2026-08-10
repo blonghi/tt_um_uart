@@ -71,7 +71,7 @@ output pins for the upper bits of rx_data and 2 input pins for wr_enb
 and rx.
 
 
-### Baud Rate
+## How it works
 
 **My Main Assumptions**
 
