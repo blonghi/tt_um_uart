@@ -95,27 +95,27 @@ and rx.
 ### The Math: 
 The 50 MHz clock means:
 
-$$
+$
 50,000,000 \text{ clock cycles per second}
-$$
+$
 
 9600 baud means:
 
-$$
+$
 9600 \text{bits per second}
-$$
+$
 
 So the number of clock cycles in one bit is:
 
-$$
+$
 \frac{50,000,000}{9600} \approx 5208.33
-$$
+$
 
 For RX, I use **16x oversampling**, meaning there are 16 RX ticks for every bit:
 
-$$
+$
 \frac{5208.33}{16} \approx 325.52
-$$
+$
 
 So the RX counter uses approximately 326 clock cycles per RX tick.
 
