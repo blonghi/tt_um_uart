@@ -83,7 +83,7 @@ and rx.
 - RX samples near **tick 8**
 
 
-# The Math: 
+### The Math: 
 The 50 MHz clock means:
 
 $$
