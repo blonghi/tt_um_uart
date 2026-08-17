@@ -473,3 +473,30 @@ async def test_tx_data_lsb_first_0xFF(dut):
     assert bits == bits_lsb_first(0xFF), \
         f"Expected LSB-first 0xFF, got {bits}"
     assert stop_bit == 1, "Stop bit must be high"
+
+
+@cocotb.test()
+async def test_tx_start_bit_width_stays_consistent(dut):
+    """Fails if the start bit's width varies with trigger phase."""
+    await setup_clock(dut)
+    widths = []
+    for extra_delay in range(0, TX_BAUD_CYCLES, 200):
+        await reset_dut(dut)
+        await ClockCycles(dut.clk, extra_delay)
+        dut.ui_in.value = 0x55
+        set_wr_enb_pin(dut, 1)
+        await RisingEdge(dut.clk)
+        set_wr_enb_pin(dut, 0)
+        while get_tx_pin(dut) == 1:
+            await RisingEdge(dut.clk)
+        low_cycles = 0
+        while get_tx_pin(dut) == 0:
+            low_cycles += 1
+            await RisingEdge(dut.clk)
+        widths.append(low_cycles)
+
+    min_w, max_w = min(widths), max(widths)
+    assert max_w - min_w < 50, (
+        f"Start bit width varies from {min_w} to {max_w} cycles"
+        f"expected consistent ~{TX_BAUD_CYCLES}"
+    )
