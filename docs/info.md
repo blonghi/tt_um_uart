@@ -15,7 +15,7 @@ The design is split into four modules:
 
 - **`tt_um_uart`** - the top-level wrapepr that maps pins to signals and instantiates the 3 following modules.
 
-- **`baud_rate_gen`** - generates two enable ticks from the system clock. 'tx_counter' wraps around at 5208, producing 'tx_enb' (one pulse per baud period). 'tx_counter' resets every 'tx_sync' pulse (the start of a new frame), keeping TX bit timing aligned. 'rx_counter' wraps around at 326 (1/16th of 'tx_counter's range) This produces 'rx_enb' at 16x the rate to allow the receiver to oversample and locate the center of each incoming bit. 'rx_counter' resets every 'rx_sync' pulse (start-bit detection), keeping RX sampling aligned. 
+- **`baud_rate_gen`** - generates two enable ticks from the system clock. 'tx_counter' wraps around at 5119, producing 'tx_enb' (one pulse per baud period). 'tx_counter' resets every 'tx_sync' pulse (the start of a new frame), keeping TX bit timing aligned. 'rx_counter' wraps around at 319 (1/16th of 'tx_counter's range) This produces 'rx_enb' at 16x the rate to allow the receiver to oversample and locate the center of each incoming bit. 'rx_counter' resets every 'rx_sync' pulse (start-bit detection), keeping RX sampling aligned. 
 
 - **`transmitter`** - FSM that on write request serializes an 8-bit byte onto the tx line as: start bit, 8 data bits (LSB first),  then a stop bit. 
 
@@ -83,29 +83,29 @@ and rx.
 
 **My Main Assumptions**
 
-- System clock: **50 MHz**
+- System clock: **49.152 MHz**
 - Target baud rate: **9600**
-- TX: approximately **5208 clock cycles per bit**
+- TX: exactly **5120 clock cycles per bit**
 - RX: **16x oversampling**
-- RX: approximately **326 clock cycles per tick**
+- RX: exactly **320 clock cycles per tick**
 - RX samples near **tick 8**
 
 
 
 ### The Math: 
-The clock runs at $50,006,400$ Hz (not a round 50 MHz, see note below), which means $50,006,400$ clock cycles per second.
+The clock runs at $49,152,000$ Hz (not a round 50 MHz, see note below), which means $49,152,000$ clock cycles per second.
 
 9600 baud means $9600$ bits per second.
 
-So the number of clock cycles in one bit is $\frac{50,006,400}{9600} = 5209$.
+So the number of clock cycles in one bit is $\frac{49,152,000}{9600} = 5120$.
 
-For RX, I use **16x oversampling**, meaning there are 16 RX ticks for every bit: $\frac{5209}{16} \approx 325.56$.
+For RX, I use **16x oversampling**, meaning there are 16 RX ticks for every bit: $\frac{5120}{16} = 320$.
 
-So the RX counter uses approximately 326 clock cycles per RX tick.
+So the RX counter uses exactly 320 clock cycles per RX tick.
 
 The receiver then counts these 16 RX ticks and samples the actual RX signal around tick 8.
 
-**Note:** 50,000,000 / 9600 isn't a whole number (5208.33), which causes a small but real timing error. 50,006,400 was chosen specifically because it divides evenly, confirmed through FPGA testing where a similar rounding mismatch (27MHz clock, 9600 baud) caused real, repeatable decode errors until a cleanly dividing rate was used instead.
+**Note:** 50,000,000 / 9600 isn't a whole number (5208.33), which causes a small but real timing error. 49,152,000 was chosen specifically because it divides evenly at both levels: once by 9600 for the bit period, and again by 16 for the RX tick. That second one matters, since a clock that only divides evenly by 9600 can still leave the RX tick with a rounding error. 49.152 MHz is also a standard crystal frequency, so it's a rate real hardware can actually produce. This all came out of FPGA testing, where a rounding mismatch (27MHz clock, 9600 baud) caused real, repeatable decode errors until a cleanly dividing rate was used instead.
 
 ## How to test
 
@@ -120,4 +120,24 @@ make -B
 **GLS**
 
 Requires one-time PDK setup which can be a headache ;-;. 
+
+Once the PDK is set up, this is the whole sequence. Run it again every time you change a `.v` file, since hardening makes a new netlist and the copy sitting in `test/` goes stale.
+
+```bash
+export PDK_ROOT=/path/to/IHP-Open-PDK
+export PDK=ihp-sg13cmos5l
+export LIBRELANE_TAG=3.0.0rc1
+
+# from the repo root
+./tt/tt_tool.py --harden --ihp
+
+cd test
+make -B                  # RTL simulation
+
+TOP_MODULE=$(cd .. && ./tt/tt_tool.py --print-top-module --ihp)
+cp ../runs/wokwi/final/nl/$TOP_MODULE.nl.v gate_level_netlist.v
+
+make -B GATES=yes        # gate-level simulation
+```
+
 

@@ -10,10 +10,10 @@ module baud_rate_gen (
 );
 
 // Timing assumptions:
-//      Clock: 50 MHz
+//      Clock: 49.152 MHz
 //      Baud: 9600 bits/second 
-//      TX: ~5208 cycles/bit (50 MHz / 9600)
-//      RX: 326 cycles/RX tick (5208 / 16 = ~326)
+//      TX: 5120 cycles/bit (49.152 MHz / 9600)
+//      RX: 320 cycles/RX tick (5120 / 16 = 320)
 
   reg [12:0] tx_counter;
   reg [12:0] rx_counter;
@@ -23,17 +23,17 @@ module baud_rate_gen (
 
   always @(posedge clk) begin
     if (!rst_n || rx_sync) rx_counter <= 0;
-    else if (rx_counter == 326) rx_counter <= 0;
+    else if (rx_counter == 319) rx_counter <= 0;
     else rx_counter <= rx_counter + 1'b1;
   end
 
   always @(posedge clk) begin
     if (!rst_n || tx_sync) tx_counter <= 0;
-    else if (tx_counter == 5208) tx_counter <= 0;
+    else if (tx_counter == 5119) tx_counter <= 0;
     else tx_counter <= tx_counter + 1'b1;
   end
 
-  assign tx_enb = (tx_counter == 5208) ? 1'b1 : 1'b0;
-  assign rx_enb = (rx_counter == 163) ? 1'b1 : 1'b0;
+  assign tx_enb = (tx_counter == 5119) ? 1'b1 : 1'b0;
+  assign rx_enb = (rx_counter == 159) ? 1'b1 : 1'b0;
 
 endmodule

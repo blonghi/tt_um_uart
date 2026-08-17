@@ -4,8 +4,8 @@ from cocotb.triggers import ClockCycles, RisingEdge
 
 
 CLK_PERIOD_NS = 20
-TX_BAUD_CYCLES = 5208
-RX_BAUD_CYCLES = 5208
+TX_BAUD_CYCLES = 5120
+RX_BAUD_CYCLES = 5120
 
 
 # ---------------------------------------------------------------------------
