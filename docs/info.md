@@ -105,7 +105,9 @@ So the RX counter uses exactly 320 clock cycles per RX tick.
 
 The receiver then counts these 16 RX ticks and samples the actual RX signal around tick 8.
 
-**Note:** 50,000,000 / 9600 isn't a whole number (5208.33), which causes a small but real timing error. 49,152,000 was chosen specifically because it divides evenly at both levels: once by 9600 for the bit period, and again by 16 for the RX tick. That second one matters, since a clock that only divides evenly by 9600 can still leave the RX tick with a rounding error. 49.152 MHz is also a standard crystal frequency, so it's a rate real hardware can actually produce. This all came out of FPGA testing, where a rounding mismatch (27MHz clock, 9600 baud) caused real, repeatable decode errors until a cleanly dividing rate was used instead.
+**Note:** 50,000,000 / 9600 isn't a whole number (5208.33), which causes a small timing error. 49,152,000 was chosen specifically because it divides evenly at both levels: once by 9600 for the bit period, and again by 16 for the RX tick. 
+
+This all came out of FPGA testing, where a rounding mismatch (27MHz clock, 9600 baud) caused decode errors until a cleanly dividing rate was used instead.
 
 ## How to test
 
