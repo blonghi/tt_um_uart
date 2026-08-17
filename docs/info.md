@@ -15,7 +15,7 @@ The design is split into four modules:
 
 - **`tt_um_uart`** - the top-level wrapepr that maps pins to signals and instantiates the 3 following modules.
 
-- **`baud_rate_gen`** - generates two enable ticks from the system clock. 'tx_counter' is free-running, wrapping around at 5208, producing 'tx_enb' (one pulse per baud period). 'rx_counter' wraps around at 326 (1/16th of 'tx_counter's range) This produces 'rx_enb' at 16x the rate to allow the receiver to oversample and locate the center of each incoming bit. 'rx_counter' resets every 'rx_sync' pulse (start-bit detection), keeping RX sampling aligned. 
+- **`baud_rate_gen`** - generates two enable ticks from the system clock. 'tx_counter' wraps around at 5208, producing 'tx_enb' (one pulse per baud period). 'tx_counter' resets every 'tx_sync' pulse (the start of a new frame), keeping TX bit timing aligned. 'rx_counter' wraps around at 326 (1/16th of 'tx_counter's range) This produces 'rx_enb' at 16x the rate to allow the receiver to oversample and locate the center of each incoming bit. 'rx_counter' resets every 'rx_sync' pulse (start-bit detection), keeping RX sampling aligned. 
 
 - **`transmitter`** - FSM that on write request serializes an 8-bit byte onto the tx line as: start bit, 8 data bits (LSB first),  then a stop bit. 
 
@@ -93,17 +93,19 @@ and rx.
 
 
 ### The Math: 
-The 50 MHz clock means $50,000,000$ clock cycles per second.
+The clock runs at $50,006,400$ Hz (not a round 50 MHz, see note below), which means $50,006,400$ clock cycles per second.
 
 9600 baud means $9600$ bits per second.
 
-So the number of clock cycles in one bit is $\frac{50,000,000}{9600} \approx 5208.33$.
+So the number of clock cycles in one bit is $\frac{50,006,400}{9600} = 5209$.
 
-For RX, I use **16x oversampling**, meaning there are 16 RX ticks for every bit: $\frac{5208.33}{16} \approx 325.52$.
+For RX, I use **16x oversampling**, meaning there are 16 RX ticks for every bit: $\frac{5209}{16} \approx 325.56$.
 
 So the RX counter uses approximately 326 clock cycles per RX tick.
 
 The receiver then counts these 16 RX ticks and samples the actual RX signal around tick 8.
+
+**Note:** 50,000,000 / 9600 isn't a whole number (5208.33), which causes a small but real timing error. 50,006,400 was chosen specifically because it divides evenly, confirmed through FPGA testing where a similar rounding mismatch (27MHz clock, 9600 baud) caused real, repeatable decode errors until a cleanly dividing rate was used instead.
 
 ## How to test
 

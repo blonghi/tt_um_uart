@@ -21,6 +21,7 @@ module tt_um_uart (
 
   wire rx_enb;
   wire rx_sync;
+  wire tx_sync;
   wire [7:0] rx_data;
   wire rx_valid;
 
@@ -42,6 +43,7 @@ module tt_um_uart (
       .clk(clk),
       .rst_n(rst_n),
       .rx_sync(rx_sync),
+      .tx_sync(tx_sync),
 
       //outputs
       .rx_enb(rx_enb),
@@ -57,7 +59,8 @@ module tt_um_uart (
       .tx_data(tx_data),
 
       //outputs
-      .tx(uo_out[0])
+      .tx(uo_out[0]),
+      .tx_sync(tx_sync)
   );
 
   receiver u_receiver (

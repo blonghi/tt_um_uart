@@ -8,12 +8,14 @@ module transmitter (
     input tx_enb,  // Advance to the next bit
     input [7:0] tx_data,  // Byte to transmit
 
-    output reg tx
+    output reg tx,
+    output reg tx_sync
 );
 
   // 1 start bit, 8 data bits, 1 stop bit
 
   // Tracks the index of the bit being transmitted.
+  // 
   reg [2:0] bit_index;
 
   // Temporary storage of the byte currently being transmitted.
@@ -21,6 +23,8 @@ module transmitter (
 
   // Tracks the two ticks needed to complete stop-bit phase
   reg stop_phase;
+
+  reg just_entered_start;
 
   typedef enum reg [1:0] {
     IDLE  = 2'b00,
@@ -31,13 +35,15 @@ module transmitter (
 
   state_t state;
 
-  always @(posedge clk or negedge rst_n) begin
+  always @(posedge clk) begin
     if (!rst_n) begin
       state <= IDLE;
       tx <= 1;
       bit_index <= 0;
       tx_reg <= 0;
       stop_phase <= 0;
+      tx_sync <= 0;
+      just_entered_start <= 0;
 
     end else begin
 
@@ -47,17 +53,24 @@ module transmitter (
           tx <= 1;
           bit_index <= 0;
           stop_phase <= 0;
+          tx_sync <= 0;
+          just_entered_start <= 0;
 
           if (wr_enb) begin
             state  <= START;
             tx_reg <= tx_data;
+            tx_sync <= 1;
+            just_entered_start <= 1;
           end
         end
 
         START: begin
           tx <= 0;
+          tx_sync <= 0;
 
-          if (tx_enb) begin
+          if (just_entered_start) begin
+            just_entered_start <= 0;
+          end else if (tx_enb) begin
             tx <= tx_reg[0];
             bit_index <= 1;
             state <= DATA;

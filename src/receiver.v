@@ -36,7 +36,7 @@ module receiver (
   reg [7:0] shift_reg;
 
 
-  always @(posedge clk or negedge rst_n) begin
+  always @(posedge clk) begin
     if (!rst_n) begin
       state <= IDLE;
       rx_valid <= 0;
