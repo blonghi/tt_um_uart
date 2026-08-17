@@ -5,7 +5,7 @@
 
 `default_nettype none
 
-module tt_um_uart (
+module tt_um_blonghi_uart (
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs
     input  wire [7:0] uio_in,   // X IOs: Input path

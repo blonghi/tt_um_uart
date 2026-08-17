@@ -13,7 +13,7 @@ This project implements a simple UART (Universal Asynchronous Receiver + Transmi
 
 The design is split into four modules:
 
-- **`tt_um_uart`** - the top-level wrapepr that maps pins to signals and instantiates the 3 following modules.
+- **`tt_um_blonghi_uart`** - the top-level wrapepr that maps pins to signals and instantiates the 3 following modules.
 
 - **`baud_rate_gen`** - generates two enable ticks from the system clock. 'tx_counter' wraps around at 5119, producing 'tx_enb' (one pulse per baud period). 'tx_counter' resets every 'tx_sync' pulse (the start of a new frame), keeping TX bit timing aligned. 'rx_counter' wraps around at 319 (1/16th of 'tx_counter's range) This produces 'rx_enb' at 16x the rate to allow the receiver to oversample and locate the center of each incoming bit. 'rx_counter' resets every 'rx_sync' pulse (start-bit detection), keeping RX sampling aligned. 
 
