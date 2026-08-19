@@ -22,9 +22,21 @@ module receiver (
 
   state_t state;
 
+  reg rx_meta, rx_s;
+
+  always @(posedge clk) begin
+    if (!rst_n) begin
+      rx_meta <= 1'b1;
+      rx_s <= 1'b1;
+    end else begin
+      rx_meta <= rx;
+      rx_s <= rx_meta;
+    end
+  end
+
   // Detects the start bit
   reg rx_prev;
-  wire falling_edge = (rx_prev == 1'b1) && (rx == 1'b0);
+  wire falling_edge = (rx_prev == 1'b1) && (rx_s == 1'b0);
 
   // Tracks the index of the bit being sampled
   reg [3:0] bit_index;
@@ -50,7 +62,7 @@ module receiver (
 
 
     end else begin
-      rx_prev <= rx;
+      rx_prev <= rx_s;
 
       case (state)
 
@@ -83,11 +95,10 @@ module receiver (
 
 
               if (rx_counter == 8 & bit_index > 0) begin
-                shift_reg[bit_index-1] <= rx;
+                shift_reg[bit_index-1] <= rx_s;
               end
 
-              if (bit_index == 8) begin
-                shift_reg[bit_index-1] <= rx;
+              if (bit_index == 8 && rx_counter == 15) begin
                 rx_valid <= 0;
                 state <= STOP;
               end
@@ -103,7 +114,7 @@ module receiver (
         end
 
         STOP: begin
-          if (rx && rx_enb) begin
+          if (rx_s && rx_enb) begin
             rx_data <= shift_reg;
             rx_valid <= 1;
             state <= IDLE;
