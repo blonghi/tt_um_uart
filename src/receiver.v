@@ -114,10 +114,12 @@ module receiver (
         end
 
         STOP: begin
-          if (rx_s && rx_enb) begin
-            rx_data <= shift_reg;
-            rx_valid <= 1;
-            state <= IDLE;
+          if (rx_enb) begin
+            rx_counter <= rx_counter + 1;
+            if (rx_counter == 8) begin
+              if (rx_s) begin rx_data <= shift_reg; rx_valid <= 1; end
+              state <= IDLE;
+            end
           end
         end
 
